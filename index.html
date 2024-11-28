@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Premium Code Purchase</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #4e54c8, #8f94fb);
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      color: #333;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .package {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .package img {
+      width: 100%;
+      max-width: 400px;
+      aspect-ratio: 16 / 9;
+      border-radius: 5px;
+      object-fit: cover;
+    }
+    .package label {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .terms {
+      color: blue;
+      cursor: pointer;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .terms:hover {
+      text-decoration: underline;
+    }
+    button {
+      background-color: #4e54c8;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+    button:hover {
+      background-color: #373bb5;
+    }
+    #popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      color: #333;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      display: none;
+      text-align: center;
+    }
+    #popup h2 {
+      margin-bottom: 10px;
+      color: #4e54c8;
+    }
+    #popup button {
+      background-color: #4e54c8;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Buy Premium Code</h1>
+    <div class="package">
+      <img src="https://i.imghippo.com/files/nOvR4042ts.png" alt="30 Days Package">
+      <label>
+        <input type="radio" name="package" value="30 Days Premium">
+        28 Days Premium - ₹20
+      </label>
+    </div>
+    <div class="package">
+      <img src="https://i.imghippo.com/files/maS6024Tc.jpg" alt="14 Days Package">
+      <label>
+        <input type="radio" name="package" value="14 Days Premium">
+        14 Days Premium - ₹10
+      </label>
+    </div>
+    <div class="terms" onclick="redirectToTerms()">Terms and Conditions</div>
+    <button onclick="proceedToBuy()">Proceed to Buy</button>
+  </div>
+
+  <div id="popup">
+    <h2>Thank You!</h2>
+    <p>Your premium code will be received within 6 hours on your email address.</p>
+    <button onclick="closePopup()">Close</button>
+  </div>
+
+  <script>
+    function redirectToTerms() {
+      window.open("https://trendymovies.github.io/TERMS-AND-CONDITION/", "_self");
+    }
+
+    function proceedToBuy() {
+      const selectedPackage = document.querySelector('input[name="package"]:checked');
+      if (!selectedPackage) {
+        alert("Please select a package before proceeding.");
+        return;
+      }
+
+      window.open("https://docs.google.com/forms/d/e/1FAIpQLSdv0I8-2wckGhdp2sKu8RWaLrPgrkRRl3vCJbd8tNKnQU9BGA/viewform", "_blank"); // Redirect in a new tab
+
+      // Show the pop-up after 20 seconds
+      setTimeout(() => {
+        document.getElementById('popup').style.display = 'block';
+      }, 20000); // 20 seconds in milliseconds
+    }
+
+    function closePopup() {
+      document.getElementById('popup').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
