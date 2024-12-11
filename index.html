@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Premium Code Purchase</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -28,28 +30,16 @@
       border-radius: 8px;
       text-align: left;
       display: flex;
-      flex-direction: column;
       align-items: center;
+      justify-content: space-between;
     }
     .package img {
-      width: 100%;
-      max-width: 400px;
-      aspect-ratio: 16 / 9;
+      width: 100px;
+      height: auto;
       border-radius: 5px;
-      object-fit: cover;
     }
     .package label {
-      margin-top: 10px;
       font-weight: bold;
-    }
-    .terms {
-      color: blue;
-      cursor: pointer;
-      margin-top: 10px;
-      font-size: 14px;
-    }
-    .terms:hover {
-      text-decoration: underline;
     }
     button {
       background-color: #4e54c8;
@@ -76,7 +66,8 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
       z-index: 1000;
       display: none;
-      text-align: center;
+      width: 90%;
+      max-width: 400px;
     }
     #popup h2 {
       margin-bottom: 10px;
@@ -90,54 +81,164 @@
       border-radius: 5px;
       cursor: pointer;
     }
+    #paymentForm {
+      display: none;
+      margin-top: 20px;
+    }
+    form label {
+      font-weight: bold;
+    }
+    form input,
+    form select {
+      width: 100%;
+      padding: 8px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+ 
+  }
+    /* History Button */
+    #historyBtn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #373bb5;
+      color: #fff;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    #historyBtn:hover {
+      background-color: #4e54c8;
+    }
   </style>
 </head>
 <body>
+ <!-- History Button -->
+ <button id="historyBtn" onclick="window.location.href='https://history.com'">History</button>
   <div class="container">
     <h1>Buy Premium Code</h1>
     <div class="package">
-      <img src="https://i.imghippo.com/files/nOvR4042ts.png" alt="30 Days Package">
+      <img src="package1.jpg" alt="28 Days Premium">
       <label>
-        <input type="radio" name="package" value="30 Days Premium">
+        <input type="radio" name="package" value="28 Days Premium - ₹20">
         28 Days Premium - ₹20
       </label>
     </div>
     <div class="package">
-      <img src="https://i.imghippo.com/files/maS6024Tc.jpg" alt="14 Days Package">
+      <img src="package2.jpg" alt="14 Days Premium">
       <label>
-        <input type="radio" name="package" value="14 Days Premium">
+        <input type="radio" name="package" value="14 Days Premium - ₹10">
         14 Days Premium - ₹10
       </label>
     </div>
-    <div class="terms" onclick="redirectToTerms()">Terms and Conditions</div>
-    <button onclick="proceedToBuy()">Proceed to Buy</button>
+    <button onclick="showForm()">Buy</button>
+
+    <form id="paymentForm">
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" required>
+      <label for="email">Email ID</label>
+      <input type="email" id="email" name="email" required>
+      <label for="paymentMethod">Choose Payment Method</label>
+      <select id="paymentMethod" name="paymentMethod" required>
+        <option value="" disabled selected>Select Method</option>
+        <option value="Google Play Code">Google Play Code</option>
+        <option value="Amazon Gift Code">Amazon Gift Code</option>
+      </select>
+      <label for="giftCode">Enter Gift Code</label>
+      <input type="text" id="giftCode" name="giftCode" required>
+      <button type="button" onclick="submitForm()">Submit</button>
+    </form>
   </div>
 
   <div id="popup">
     <h2>Thank You!</h2>
-    <p>Your premium code will be received within 6 hours on your email address.</p>
+    <h3 id="orderId"></h3>
+    <p>Your premium code will be received within 6 hours. Copy this order ID to track your order.</p>
     <button onclick="closePopup()">Close</button>
   </div>
 
   <script>
-    function redirectToTerms() {
-      window.open("https://trendymovies.github.io/TERMS-AND-CONDITION/", "_self");
-    }
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCBPGSYNVaPPDu7RWee9ymckMaI1VQNjd4",
+      authDomain: "trendy-movie.firebaseapp.com",
+      databaseURL: "https://trendy-movie-default-rtdb.firebaseio.com",
+      projectId: "trendy-movie",
+      storageBucket: "trendy-movie.appspot.com",
+      messagingSenderId: "699469684359",
+      appId: "1:699469684359:web:34cc2adfc8019b89a76222",
+      measurementId: "G-54SX69JVY3"
+    };
+    firebase.initializeApp(firebaseConfig);
 
-    function proceedToBuy() {
+    function showForm() {
       const selectedPackage = document.querySelector('input[name="package"]:checked');
       if (!selectedPackage) {
         alert("Please select a package before proceeding.");
         return;
       }
-
-      window.open("https://docs.google.com/forms/d/e/1FAIpQLSdv0I8-2wckGhdp2sKu8RWaLrPgrkRRl3vCJbd8tNKnQU9BGA/viewform", "_blank"); // Redirect in a new tab
-
-      // Show the pop-up after 20 seconds
-      setTimeout(() => {
-        document.getElementById('popup').style.display = 'block';
-      }, 20000); // 20 seconds in milliseconds
+      document.getElementById('paymentForm').style.display = 'block';
     }
+
+    function generateOrderId() {
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const numbers = '0123456789';
+      let orderId = letters[Math.floor(Math.random() * 26)] +
+        letters[Math.floor(Math.random() * 26)] +
+        numbers[Math.floor(Math.random() * 10)] +
+        numbers[Math.floor(Math.random() * 10)] +
+        numbers[Math.floor(Math.random() * 10)] +
+        numbers[Math.floor(Math.random() * 10)];
+      return orderId;
+    }
+    function generateOrderId() {
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const numbers = '0123456789';
+  let orderId = letters[Math.floor(Math.random() * 26)] +
+    letters[Math.floor(Math.random() * 26)] +
+    numbers[Math.floor(Math.random() * 10)] +
+    numbers[Math.floor(Math.random() * 10)] +
+    numbers[Math.floor(Math.random() * 10)] +
+    numbers[Math.floor(Math.random() * 10)];
+  return orderId;
+}
+
+function submitForm() {
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const paymentMethod = document.getElementById('paymentMethod').value;
+  const giftCode = document.getElementById('giftCode').value;
+
+  if (!name || !email || !paymentMethod || !giftCode) {
+    alert("All fields are required.");
+    return;
+  }
+
+  const orderId = generateOrderId();
+  const orderData = {
+    name,
+    email,
+    package: document.querySelector('input[name="package"]:checked').value,
+    paymentMethod,
+    giftCode,
+    orderId,
+    orderStatus: "pending",  // New field for order status, initially set to "pending"
+    premiumCode: ""         // New field for premium code, initially left empty
+  };
+
+  firebase.database().ref('orders/' + orderId).set(orderData, (error) => {
+    if (error) {
+      alert("Error saving order. Please try again.");
+    } else {
+      document.getElementById('orderId').textContent = `Order ID: ${orderId}`;
+      document.getElementById('popup').style.display = 'block';
+    }
+  });
+}
 
     function closePopup() {
       document.getElementById('popup').style.display = 'none';
